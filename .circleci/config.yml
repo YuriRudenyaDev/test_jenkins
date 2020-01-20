@@ -5,7 +5,7 @@ references:
   workspace: &workspace
     ~/src
 
-  ## Docker image configurations
+  ## Docker image  configurations
   android_config: &android_config
     working_directory: *workspace
     docker:
