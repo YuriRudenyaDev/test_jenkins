@@ -3,6 +3,11 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details fdfsd
 #
 version: 2
+references:
+## Workspaces
+  workspace: &workspace
+    ~/src
+
 jobs:
   build:
       steps:
@@ -18,8 +23,8 @@ jobs:
         
 workflows:
     version: 2
-   
-    deploying_test:
+    workflow:
+#    deploying_test:
         jobs:
             - build_after_pull_request:
                 requires:
