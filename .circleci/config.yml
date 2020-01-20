@@ -1,52 +1,74 @@
-# Java Gradle CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details fdfsd
-#
 version: 2
 
 references:
-## Workspaces
-workspace: &workspace
-  ~/src
+  ## Workspaces
+  workspace: &workspace
+    ~/src
+
+  ## Docker image configurations
+  android_config: &android_config
+    working_directory: *workspace
+    docker:
+      - image: circleci/android:api-27
+    environment:
+      TERM: dumb
+      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
+
+  ## Cache
+  gradle_key: &gradle_key
+    jars-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+
+  gems_key: &gems_key
+    gems-{{ checksum "Gemfile.lock" }}
+
+  restore_gradle_cache: &restore_gradle_cache
+    restore_cache:
+      key: *gradle_key
+
+  restore_gems_cache: &restore_gems_cache
+    restore_cache:
+      key: *gems_key
+
+  save_gradle_cache: &save_gradle_cache
+    save_cache:
+      key: *gradle_key
+      paths:
+        - ~/.gradle
+        - ~/.m2
+
+  save_gems_cache: &save_gems_cache
+    save_cache:
+      key: *gems_key
+      paths:
+        - vendor/bundle
 
 
 jobs:
-  build:
-    docker:
-      - image: circleci/openjdk:8-jdk
+  deploy_qs:
+    <<: *android_config
     steps:
       - checkout
 
-    build_after_pull_request:
-        docker:
-            - image: circleci/openjdk:8-jdk
-        steps:
-            - checkout
-#        working_directory: ~/repo
-          
-    merge_after_pull_request:
-        docker:
-            - image: circleci/openjdk:8-jdk
-        steps:
-            - checkout
-#        working_directory: ~/repo
-            
+
 workflows:
-    version: 2
-    workflow:
-#    deploying_test:
-        jobs:
-            - build_after_pull_request:
-                requires:
-                    - approval_for_build_after_pull_request
-            - approval_for_build_after_pull_request:
-                type: approval
-#                requires:
-#                    - build
-            - approval_for_merge_after_pull_request:
-                type: approval
-                requires:
-                    - build_after_pull_request
-            - merge_after_pull_request:
-                requires:
-                    - approval_for_merge_after_pull_request
+  version: 2
+  workflow:
+    jobs:
+      - deploy_qs:
+          filters:
+            branches:
+              only:
+                - develop
+           requires:
+                - approval_for_build_after_pull_request
+      - approval_for_build_after_pull_request:
+          type: approval
+      - approval_for_merge_after_pull_request:
+          type: approval
+          requires:
+              - build_after_pull_request
+      - merge_after_pull_request:
+          requires:
+              - approval_for_merge_after_pull_request
+          
