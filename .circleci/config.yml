@@ -64,20 +64,20 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - /^pull\/.*$/
       - approval_for_build_after_pull_request:
           type: approval
           filters:
             branches:
               only:
-                - develop
+                - /^pull\/.*$/
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
           filters:
             branches:
               only:
-                - develop
+                - /^pull\/.*$/
       - approval_for_merge_after_pull_request:
           type: approval
           requires:
@@ -85,6 +85,6 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - /^pull\/.*$/
 
           
