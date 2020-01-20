@@ -63,32 +63,29 @@ workflows:
             - approval_for_build_after_pull_request
           filters:
             branches:
-              only:
-                - develop
-            pull_request: true
+              ignore:
+                - master
       - approval_for_build_after_pull_request:
           type: approval
           filters:
             branches:
-              only:
-                - develop
-            pull_request: true
+              ignore:
+                - master
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
           filters:
             branches:
-              only:
-                - develop
-            pull_request: true
+              ignore:
+                - master
       - approval_for_merge_after_pull_request:
           type: approval
           requires:
               - deploy_qs
           filters:
             branches:
-              only:
-                - develop
-            pull_request: true
+              ignore:
+                - master
+#                /^(?!pull\/).*$/
 
           
