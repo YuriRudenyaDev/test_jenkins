@@ -23,7 +23,8 @@ workflows:
         jobs:
             -approval_for_build_after_pull_request:
                 type: approval
-                requires: - build
+                requires:
+                    - build
             -build_after_pull_request:
                 requires:
                     - approval_for_build_after_pull_request
