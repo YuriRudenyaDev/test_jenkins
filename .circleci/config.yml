@@ -55,14 +55,18 @@ workflows:
   workflow:
     jobs:
       - deploy_qs:
-#          requires:
-#            - approval_for_build_after_pull_request
+          requires:
+            - approval_for_build_after_pull_request
           filters:
             branches:
               only:
                 - develop
       - approval_for_build_after_pull_request:
           type: approval
+          filters:
+            branches:
+              only:
+                - develop
 #      - merge_after_pull_request:
 #          requires:
 #              - approval_for_merge_after_pull_request
