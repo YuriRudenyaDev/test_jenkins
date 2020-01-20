@@ -61,20 +61,20 @@ workflows:
       - deploy_qs:
           requires:
             - approval_for_build_after_pull_request
-          filters:
+#          filters:
 #            branches:
 #              only:
 #                - /pull\/[0-9]+/
       - approval_for_build_after_pull_request:
           type: approval
-          filters:
+#          filters:
 #            branches:
 #              only:
 #                - /pull\/[0-9]+/
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
-          filters:
+#          filters:
 #            branches:
 #              only:
 #                - /pull\/[0-9]+/
@@ -82,7 +82,7 @@ workflows:
           type: approval
           requires:
               - deploy_qs
-          filters:
+#          filters:
 #            branches:
 #              only:
 #                - /pull\/[0-9]+/
