@@ -17,11 +17,13 @@ jobs:
         - checkout
         
 workflows:
-   version: 2
-   deploying_jobs:
+    version: 2
+   
+    deploying_test:
         jobs:
             -approval_for_build_after_pull_request:
                 type: approval
+                requires: - build
             -build_after_pull_request:
                 requires:
                     - approval_for_build_after_pull_request
