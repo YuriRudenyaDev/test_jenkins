@@ -3,13 +3,12 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details fdfsd
 #
 version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/openjdk:8-jdk
 
-    working_directory: ~/repo
-    
+references:
+workspace: &workspace
+             ~/src
+
+jobs:
     build:
         steps:
           - checkout
@@ -30,8 +29,6 @@ workflows:
         jobs:
             - approval_for_build_after_pull_request:
                 type: approval
-                requires:
-                    - build
             - build_after_pull_request:
                 requires:
                     - approval_for_build_after_pull_request
