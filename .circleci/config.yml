@@ -19,9 +19,10 @@ jobs:
           - checkout
         
       
-
+version: 2
 workflows:
-    version: 2
+   workflow:
+      jobs:
         - approval_for_build_after_pull_request:
             type: approval
         - build_after_pull_request:
