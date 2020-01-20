@@ -11,11 +11,11 @@ workspace: &workspace
 
 
 jobs:
-#  build:
-#    docker:
-#      - image: circleci/openjdk:8-jdk
-#    steps:
-#      - checkout
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
 
     build_after_pull_request:
         docker:
@@ -41,8 +41,8 @@ workflows:
                     - approval_for_build_after_pull_request
             - approval_for_build_after_pull_request:
                 type: approval
-#                    requires:
-#                        - build
+                    requires:
+                        - build
             - approval_for_merge_after_pull_request:
                 type: approval
                 requires:
