@@ -15,23 +15,22 @@ jobs:
   merge_after_pull_request:
       steps:
         - checkout
-        
-workflows:
-    version: 2
+
+  deploying_test:
+    jobs:
+        -approval_for_build_after_pull_request:
+            type: approval
+            requires:
+                - build
+        -build_after_pull_request:
+            requires:
+                - approval_for_build_after_pull_request
+        -approval_for_merge_after_pull_request:
+            type: approval
+            requires:
+                - build_after_pull_request
+        -merge_after_pull_request:
+            requires:
+                - approval_for_merge_after_pull_request
    
-    deploying_test:
-        jobs:
-            -approval_for_build_after_pull_request:
-                type: approval
-                requires:
-                    - build
-            -build_after_pull_request:
-                requires:
-                    - approval_for_build_after_pull_request
-#            -approval_for_merge_after_pull_request:
-#                type: approval
-#                requires:
-#                    - build_after_pull_request
-#            -merge_after_pull_request:
-#                requires:
-#                    - approval_for_merge_after_pull_request
+
