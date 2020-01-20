@@ -9,9 +9,9 @@ references:
     ~/src
 
 jobs:
+  docker:
+    - image: circleci/android:api-27
   build:
-      docker:
-        - image: circleci/android:api-27
       steps:
         - checkout
 
