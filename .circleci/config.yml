@@ -26,6 +26,7 @@ workflows:
     workflow:
 #    deploying_test:
         jobs:
+            - build
             - build_after_pull_request:
                 requires:
                     - approval_for_build_after_pull_request
