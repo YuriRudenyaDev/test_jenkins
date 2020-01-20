@@ -67,12 +67,12 @@ workflows:
             branches:
               only:
                 - develop
-#      - merge_after_pull_request:
-#          requires:
-#              - approval_for_merge_after_pull_request
-#      - approval_for_merge_after_pull_request:
-#          type: approval
-#          requires:
-#              - deploy_qs
+      - merge_after_pull_request:
+          requires:
+              - approval_for_merge_after_pull_request
+      - approval_for_merge_after_pull_request:
+          type: approval
+          requires:
+              - deploy_qs
 
           
