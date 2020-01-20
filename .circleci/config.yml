@@ -70,9 +70,17 @@ workflows:
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
+          filters:
+            branches:
+              only:
+                - develop
       - approval_for_merge_after_pull_request:
           type: approval
           requires:
               - deploy_qs
+          filters:
+            branches:
+              only:
+                - develop
 
           
