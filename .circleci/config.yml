@@ -5,14 +5,17 @@
 version: 2
 
 references:
+## Workspaces
 workspace: &workspace
              ~/src
 
 jobs:
-    build:
-        steps:
-          - checkout
-          
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+    
     build_after_pull_request:
         steps:
           - checkout
