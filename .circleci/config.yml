@@ -34,7 +34,7 @@ jobs:
 workflows:
     version: 2
     workflow:
-    deploying_test:
+#    deploying_test:
         jobs:
             - build_after_pull_request:
                 requires:
