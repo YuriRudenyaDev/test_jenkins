@@ -63,29 +63,28 @@ workflows:
             - approval_for_build_after_pull_request
           filters:
             branches:
-              ignore:
-                - master
+              only:
+                - /pull\/[0-9]+/
       - approval_for_build_after_pull_request:
           type: approval
           filters:
             branches:
-              ignore:
-                - master
+              only:
+                - /pull\/[0-9]+/
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
           filters:
             branches:
-              ignore:
-                - master
+              only:
+                - /pull\/[0-9]+/
       - approval_for_merge_after_pull_request:
           type: approval
           requires:
               - deploy_qs
           filters:
             branches:
-              ignore:
-                - master
-#                /^(?!pull\/).*$/
+              only:
+                - /pull\/[0-9]+/
 
           
