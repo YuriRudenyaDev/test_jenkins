@@ -31,22 +31,22 @@ jobs:
             - checkout
 #        working_directory: ~/repo
             
-    workflows:
-        version: 2
-        workflow:
-        deploying_test:
-            jobs:
-                - build_after_pull_request:
-                    requires:
-                        - approval_for_build_after_pull_request
-                - approval_for_build_after_pull_request:
-                    type: approval
+workflows:
+    version: 2
+    workflow:
+    deploying_test:
+        jobs:
+            - build_after_pull_request:
+                requires:
+                    - approval_for_build_after_pull_request
+            - approval_for_build_after_pull_request:
+                type: approval
 #                    requires:
 #                        - build
-                - approval_for_merge_after_pull_request:
-                    type: approval
-                    requires:
-                        - build_after_pull_request
-                - merge_after_pull_request:
-                    requires:
-                        - approval_for_merge_after_pull_request
+            - approval_for_merge_after_pull_request:
+                type: approval
+                requires:
+                    - build_after_pull_request
+            - merge_after_pull_request:
+                requires:
+                    - approval_for_merge_after_pull_request
