@@ -19,7 +19,6 @@ jobs:
           - checkout
         
       
-version: 2
 workflows:
    workflow:
       jobs:
