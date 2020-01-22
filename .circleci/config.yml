@@ -1,89 +1,69 @@
 version: 2
-
 references:
-  ## Workspaces
-  workspace: &workspace
-    ~/src
-
-  ## Docker image  configurations
-  android_config: &android_config
-    working_directory: *workspace
+  workspace: ~/src
+  
+  android_config:
+    working_directory: ~/src
     docker:
-      - image: circleci/android:api-27
+    - image: circleci/android:api-27
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
-
-#  ## Cache
-#  gradle_key: &gradle_key
-#    jars-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
-#
-#  gems_key: &gems_key
-#    gems-{{ checksum "Gemfile.lock" }}
-#
-#  restore_gradle_cache: &restore_gradle_cache
-#    restore_cache:
-#      key: *gradle_key
-#
-#  restore_gems_cache: &restore_gems_cache
-#    restore_cache:
-#      key: *gems_key
-#
-#  save_gradle_cache: &save_gradle_cache
-#    save_cache:
-#      key: *gradle_key
-#      paths:
-#        - ~/.gradle
-#        - ~/.m2
-#
-#  save_gems_cache: &save_gems_cache
-#    save_cache:
-#      key: *gems_key
-#      paths:
-#        - vendor/bundle
-
-
+      _JAVA_OPTIONS: -Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
+      
 jobs:
   deploy_qs:
-    <<: *android_config
+    working_directory: ~/src
+    docker:
+    - image: circleci/android:api-27
+    environment:
+    - CIRCLE_COMPARE_URL: https://github.com/YuriRudenyaDev/test_jenkins/compare/a5fbd7035e09fc0bb6868dedc8d00e00fd46fadb...8f950fa0653ac4a76532bae51998c001f0823fa1
+    - TERM: dumb
+    - _JAVA_OPTIONS: -Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+    - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
-      - checkout
+    - checkout
   merge_after_pull_request:
-    <<: *android_config
+    working_directory: ~/src
+    docker:
+    - image: circleci/android:api-27
+    environment:
+    - CIRCLE_COMPARE_URL: https://github.com/YuriRudenyaDev/test_jenkins/compare/a5fbd7035e09fc0bb6868dedc8d00e00fd46fadb...8f950fa0653ac4a76532bae51998c001f0823fa1
+    - TERM: dumb
+    - _JAVA_OPTIONS: -Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+    - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
-      - checkout
-
+    - checkout
+    
 workflows:
   version: 2
   workflow:
     jobs:
-      - deploy_qs:
-          requires:
-            - approval_for_build_after_pull_request
-          filters:
-            branches:
-              only:
-                - /pull\/[0-9]+/
-      - approval_for_build_after_pull_request:
-          type: approval
-          filters:
-            branches:
-              only:
-                - /pull\/[0-9]+/
-      - merge_after_pull_request:
-          requires:
-              - approval_for_merge_after_pull_request
-          filters:
-            branches:
-              only:
-                - /pull\/[0-9]+/
-      - approval_for_merge_after_pull_request:
-          type: approval
-          requires:
-              - deploy_qs
-          filters:
-            branches:
-              only:
-                - /pull\/[0-9]+/
-
+    - deploy_qs:
+        requires:
+        - approval_for_build_after_pull_request
+        filters:
+          branches:
+            only:
+            - /pull\/[0-9]+/
+    - approval_for_build_after_pull_request:
+        type: approval
+        filters:
+          branches:
+            only:
+            - /pull\/[0-9]+/
+    - merge_after_pull_request:
+        requires:
+        - approval_for_merge_after_pull_request
+        filters:
+          branches:
+            only:
+            - /pull\/[0-9]+/
+    - approval_for_merge_after_pull_request:
+        type: approval
+        requires:
+        - deploy_qs
+        filters:
+          branches:
+            only:
+            - /pull\/[0-9]+/
