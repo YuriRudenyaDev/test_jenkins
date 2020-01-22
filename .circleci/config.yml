@@ -54,7 +54,7 @@ workflows:
 #            only:
 #            - /pull\/[0-9]+/
  #      - merge_after_pull_request:
-#        requires:
+#         requires:
 #        - approval_for_merge_after_pull_request
 #        filters:
 #          branches:
