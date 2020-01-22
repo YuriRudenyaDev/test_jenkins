@@ -5,7 +5,7 @@ references:
   workspace: &workspace
     ~/src
 
-  ## Docker image configurations
+  ## Docker image  configurations
   android_config: &android_config
     working_directory: *workspace
     docker:
@@ -64,20 +64,20 @@ workflows:
           filters:
             branches:
               only:
-                - /features/*
+                - /pull\/[0-9]+/
       - approval_for_build_after_pull_request:
           type: approval
           filters:
             branches:
               only:
-                - /features/*
+                - /pull\/[0-9]+/
       - merge_after_pull_request:
           requires:
               - approval_for_merge_after_pull_request
           filters:
             branches:
               only:
-                - /features/*
+                - /pull\/[0-9]+/
       - approval_for_merge_after_pull_request:
           type: approval
           requires:
@@ -85,6 +85,5 @@ workflows:
           filters:
             branches:
               only:
-                - /features/*
+                - /pull\/[0-9]+/
 
-          
