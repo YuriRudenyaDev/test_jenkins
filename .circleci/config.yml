@@ -23,6 +23,7 @@ jobs:
     - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
     - checkout
+    
   merge_after_pull_request:
     working_directory: ~/src
     docker:
@@ -42,16 +43,16 @@ workflows:
     - deploy_qs:
         requires:
         - approval_for_build_after_pull_request
-        filters:
-          branches:
-            only:
-            - /pull\/[0-9]+/
+#        filters:
+#          branches:
+#            only:
+#            - /pull\/[0-9]+/
     - approval_for_build_after_pull_request:
         type: approval
-        filters:
-          branches:
-            only:
-            - /pull\/[0-9]+/
+#        filters:
+#          branches:
+#            only:
+#            - /pull\/[0-9]+/
 #    - merge_after_pull_request:
 #        requires:
 #        - approval_for_merge_after_pull_request
