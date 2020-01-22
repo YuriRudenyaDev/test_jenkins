@@ -53,7 +53,7 @@ workflows:
 #          branches:
 #            only:
 #            - /pull\/[0-9]+/
- #     - merge_after_pull_request:
+ #      - merge_after_pull_request:
 #        requires:
 #        - approval_for_merge_after_pull_request
 #        filters:
