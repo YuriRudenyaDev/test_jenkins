@@ -24,8 +24,8 @@ jobs:
     steps:
     - checkout
     - run:
-        halt_build_on_fail: false
         command: bundler exec
+        when: always
     - run:
         halt_build_on_fail: false
         command: cd .circleCI
