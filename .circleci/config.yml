@@ -24,8 +24,8 @@ jobs:
     steps:
     - checkout
     - run:
-      halt_build_on_fail: false
-      command: bundler exec
+        halt_build_on_fail: false
+        command: bundler exec
     - run:
         halt_build_on_fail: false
         command: cd .circleCI
@@ -49,8 +49,8 @@ workflows:
   workflow:
     jobs:
     - deploy_qs:
-        requires:
-        - approval_for_build_after_pull_request
+        # requires:
+        # - approval_for_build_after_pull_request
         filters:
           branches:
             only:
