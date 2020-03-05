@@ -23,7 +23,9 @@ jobs:
     - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
     - checkout
-    - run: bundler exec
+    - run:
+      halt_build_on_fail: false
+      command: bundler exec
     - run:
         halt_build_on_fail: false
         command: cd .circleCI
