@@ -31,7 +31,9 @@ jobs:
     - run:
         command: mkdir test
         when: always
-    - run: cd test
+    - run:
+        command: cd test
+        when: always
 
   merge_after_pull_request:
     working_directory: ~/src
