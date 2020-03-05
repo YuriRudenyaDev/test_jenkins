@@ -25,11 +25,12 @@ jobs:
     - checkout
     - run:
         command: bundler exec
+    - run:
+        command: cd .circleCI
         when: always
     - run:
-        halt_build_on_fail: false
-        command: cd .circleCI
-    - run: mkdir test
+        command: mkdir test
+        when: always
     - run: cd test
 
   merge_after_pull_request:
