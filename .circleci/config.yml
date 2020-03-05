@@ -1,7 +1,7 @@
 version: 2
 references:
   workspace: ~/src
-  
+
   android_config:
     working_directory: ~/src
     docker:
@@ -10,7 +10,7 @@ references:
       TERM: dumb
       _JAVA_OPTIONS: -Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
-      
+
 jobs:
   deploy_qs:
     working_directory: ~/src
@@ -23,7 +23,13 @@ jobs:
     - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
     - checkout
-    
+    - run: bundler exec
+    - run:
+        halt_build_on_fail: false
+        command: cd .circleCI
+    - run: mkdir test
+    - run: cd test
+
   merge_after_pull_request:
     working_directory: ~/src
     docker:
@@ -35,7 +41,7 @@ jobs:
     - GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m"
     steps:
     - checkout
-    
+
 workflows:
   version: 2
   workflow:
