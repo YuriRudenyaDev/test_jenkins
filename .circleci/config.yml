@@ -1,90 +1,110 @@
+# =========================================================================================================
+# Common configuration and steps to run
+# =========================================================================================================
+
+# Common configuration (for all jobs)
+common_config: &common_config
+  macos:
+    xcode: "12.5.0"
+  working_directory: /Users/distiller/project
+  shell: /bin/bash --login -o pipefail
+
+# Common steps (for all jobs)
+build_steps: &build_steps
+  steps:
+    - add_ssh_keys:
+        fingerprints:
+            - "d8:42:82:68:e1:60:0c:e8:ea:78:5a:1e:39:5f:19:c0"
+    - checkout
+
+    - run:
+        name: Fixing XCode SPM
+        command: |
+          sudo defaults write com.apple.dt.Xcode IDEPackageSupportUseBuiltinSCM YES
+          rm ~/.ssh/id_rsa || true
+          for ip in $(dig @8.8.8.8 github.com +short); do ssh-keyscan github.com,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts || true
+          
+    - run:
+        name: Installing latest Ruby
+        command: curl -L https://get.rvm.io | bash -s stable --autolibs=enabled --ruby=ruby-2.7.1
+    - restore_cache:
+        key: circlev2-{{ checksum "Gemfile.lock" }}
+    - run: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
+    - save_cache:
+        key: circlev2-{{ checksum "Gemfile.lock" }}
+        paths:
+          - vendor/bundle
+#    - run:
+#        name: Bundler installing dependencies
+#        command: bundle install
+#        no_output_timeout: 60m
+#    - run:
+#        name: CocoaPods dependencies installation
+#        command: bundle exec pod install
+#        no_output_timeout: 60m
+#    - run:
+#        name: Install Sentry client for fastlane
+#        command: curl -sL https://sentry.io/get-cli/ | bash
+#        no_output_timeout: 60m
+#    - run:
+#        name: Generating API keys file
+#        command: bundle exec fastlane generate_api_keys SCHEME:${APP_KEYS_SCHEME}
+#        no_output_timeout: 60m
+#    - run:
+#        name: Updating project build number
+#        command: bundle exec fastlane run increment_build_number build_number:${CIRCLE_BUILD_NUM}
+#        no_output_timeout: 60m
+#    - run:
+#        name: Fastlane building scheme
+#        command: bundle exec fastlane ${BUILD_SCHEME_FOR_FASTLANE}
+#        no_output_timeout: 60m
+#    - run:
+#        name: Uploading ipa file to AWS
+#        command: bundle exec ruby aws_upload.rb ${SCHEME_NAME_FOR_AWS_SCRIPT}
+#        no_output_timeout: 60m
+#    - store_artifacts:
+#        path: /Users/distiller/project/flash-food-ios.ipa
+#        destination: artifact-file
+
+# =========================================================================================================
+# CI jobs to do
+# =========================================================================================================
 version: 2
-
-references:
-  ## Workspaces
-  workspace: &workspace
-    ~/src
-
-  ## Docker image configurations
-  android_config: &android_config
-    working_directory: *workspace
-    docker:
-      - image: circleci/android:api-27
-    environment:
-      TERM: dumb
-      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
-
-#  ## Cache
-#  gradle_key: &gradle_key
-#    jars-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
-#
-#  gems_key: &gems_key
-#    gems-{{ checksum "Gemfile.lock" }}
-#
-#  restore_gradle_cache: &restore_gradle_cache
-#    restore_cache:
-#      key: *gradle_key
-#
-#  restore_gems_cache: &restore_gems_cache
-#    restore_cache:
-#      key: *gems_key
-#
-#  save_gradle_cache: &save_gradle_cache
-#    save_cache:
-#      key: *gradle_key
-#      paths:
-#        - ~/.gradle
-#        - ~/.m2
-#
-#  save_gems_cache: &save_gems_cache
-#    save_cache:
-#      key: *gems_key
-#      paths:
-#        - vendor/bundle
-
-
 jobs:
-  deploy_qs:
-    <<: *android_config
-    steps:
-      - checkout
-  merge_after_pull_request:
-    <<: *android_config
-    steps:
-      - checkout
+
+  # DevMi
+  dev:
+    <<: *common_config
+    environment:
+      BUILD_SCHEME_FOR_FASTLANE: dev
+      SCHEME_NAME_FOR_AWS_SCRIPT: "Dev"
+      APP_KEYS_SCHEME: "DEV"
+    <<: *build_steps
+
+  # Prod
+  prod:
+    <<: *common_config
+    environment:
+      BUILD_SCHEME_FOR_FASTLANE: prod
+      SCHEME_NAME_FOR_AWS_SCRIPT: "Production"
+      APP_KEYS_SCHEME: "PRODUCTION"
+    <<: *build_steps
+
+# =========================================================================================================
+# The flows we have
+# =========================================================================================================
 
 workflows:
   version: 2
   workflow:
     jobs:
-      - deploy_qs:
-          requires:
-            - approval_for_build_after_pull_request
+      - dev:
           filters:
-            branches:
-              only:
-                - /features/*
-      - approval_for_build_after_pull_request:
-          type: approval
+              branches:
+                  only:
+                    - dev
+      - prod:
           filters:
-            branches:
-              only:
-                - /features/*
-      - merge_after_pull_request:
-          requires:
-              - approval_for_merge_after_pull_request
-          filters:
-            branches:
-              only:
-                - /features/*
-      - approval_for_merge_after_pull_request:
-          type: approval
-          requires:
-              - deploy_qs
-          filters:
-            branches:
-              only:
-                - /features/*
-
-          
+              branches:
+                  only:
+                    - master
