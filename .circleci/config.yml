@@ -14,7 +14,7 @@ references:
      # _JAVA_OPTIONS: "-Xms512m -Xmx4608m"
 
   gems_key: &gems_key
-              gems-{{ checksum "Gemfile.lock" }}
+     circlev2-{{ checksum "Gemfile.lock" }}
 
 
   restore_gems_cache: &restore_gems_cache
