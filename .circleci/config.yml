@@ -10,22 +10,6 @@ references:
       - image: circleci/android:example
     environment:
       GRADLE_OPTS: -Xmx3g -Xms3g
-      # GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4608M -XX:+HeapDumpOnOutOfMemoryError"'
-     # _JAVA_OPTIONS: "-Xms512m -Xmx4608m"
-
-  gems_key: &gems_key
-     circlev2-{{ checksum "Gemfile.lock" }}
-
-
-  restore_gems_cache: &restore_gems_cache
-    restore_cache:
-      key: *gems_key
-
-  save_gems_cache: &save_gems_cache
-    save_cache:
-      key: *gems_key
-      paths:
-        - vendor/bundle
 
   ## Dependencies
   ruby_dependencies2: &ruby_dependencies2
@@ -40,12 +24,18 @@ jobs:
     <<: *android_config
     steps:
       - checkout
-      - run: *restore_gems_cache
+      - restore_cache:
+            key: circlev2-{{ checksum "Gemfile.lock" }}
+      - run: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
       - *ruby_dependencies2
       - run:
           name: Bundler update
           command: gem install bundler:2.1.2
-      - *save_gems_cache
+      # Store bundle cache
+      - save_cache:
+          key: circlev2-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
 
 
 
