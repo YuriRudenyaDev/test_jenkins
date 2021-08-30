@@ -49,8 +49,6 @@ jobs:
 
 
 
-orbs:
-  slack: circleci/slack@3.4.1
 version: 2.1
 workflows:
   workflow:
