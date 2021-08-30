@@ -4,44 +4,32 @@ references:
   ## Workspaces
   workspace: &workspace
     ~/src
-
   ## Docker image configurations
   android_config: &android_config
     working_directory: *workspace
     docker:
-      - image: circleci/android:api-27
+      - image: circleci/android:example
     environment:
       TERM: dumb
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
-
-#  ## Cache
-#  gradle_key: &gradle_key
-#    jars-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
-#
-#  gems_key: &gems_key
-#    gems-{{ checksum "Gemfile.lock" }}
-#
-#  restore_gradle_cache: &restore_gradle_cache
-#    restore_cache:
-#      key: *gradle_key
-#
-#  restore_gems_cache: &restore_gems_cache
-#    restore_cache:
-#      key: *gems_key
-#
-#  save_gradle_cache: &save_gradle_cache
-#    save_cache:
-#      key: *gradle_key
-#      paths:
-#        - ~/.gradle
-#        - ~/.m2
-#
-#  save_gems_cache: &save_gems_cache
-#    save_cache:
-#      key: *gems_key
-#      paths:
-#        - vendor/bundle
+    -restore_cache:
+        key: circlev2-{{ checksum "Gemfile.lock" }}
+    -run:
+      name: 1 
+      command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
+    -run:
+      name: 1 
+      command: gem install ruby
+    -run:
+      name: 1 
+      command: gem install cocoapods
+    # Store bundle cache
+    -save_cache:
+      key: circlev2-{{ checksum "Gemfile.lock" }}
+      paths:
+         - vendor/bundle
+    
 
 
 jobs:
@@ -59,32 +47,32 @@ workflows:
   workflow:
     jobs:
       - deploy_qs:
-          requires:
-            - approval_for_build_after_pull_request
+          # requires:
+            # - approval_for_build_after_pull_request
           filters:
             branches:
               only:
-                - /features/*
-      - approval_for_build_after_pull_request:
-          type: approval
-          filters:
-            branches:
-              only:
-                - /features/*
-      - merge_after_pull_request:
-          requires:
-              - approval_for_merge_after_pull_request
-          filters:
-            branches:
-              only:
-                - /features/*
-      - approval_for_merge_after_pull_request:
-          type: approval
-          requires:
-              - deploy_qs
-          filters:
-            branches:
-              only:
-                - /features/*
+                - test
+      # - approval_for_build_after_pull_request:
+      #     type: approval
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /features/*
+      # - merge_after_pull_request:
+      #     requires:
+      #         - approval_for_merge_after_pull_request
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /features/*
+      # - approval_for_merge_after_pull_request:
+      #     type: approval
+      #     requires:
+      #         - deploy_qs
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /features/*
 
           
