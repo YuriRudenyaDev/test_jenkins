@@ -1,78 +1,57 @@
-version: 2
-
 references:
   ## Workspaces
   workspace: &workspace
-    ~/src
+               ~/src
+
   ## Docker image configurations
   android_config: &android_config
     working_directory: *workspace
     docker:
       - image: circleci/android:example
     environment:
-      TERM: dumb
-      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
-    -restore_cache:
-        key: circlev2-{{ checksum "Gemfile.lock" }}
-    -run:
-      name: 1 
-      command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
-    -run:
-      name: 1 
-      command: gem install ruby
-    -run:
-      name: 1 
-      command: gem install cocoapods
-    # Store bundle cache
-    -save_cache:
-      key: circlev2-{{ checksum "Gemfile.lock" }}
+      GRADLE_OPTS: -Xmx3g -Xms3g
+      # GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4608M -XX:+HeapDumpOnOutOfMemoryError"'
+     # _JAVA_OPTIONS: "-Xms512m -Xmx4608m"
+
+  gems_key: &gems_key
+     circlev2-{{ checksum "Gemfile.lock" }}
+
+
+  restore_gems_cache: &restore_gems_cache
+    restore_cache:
+      key: *gems_key
+
+  save_gems_cache: &save_gems_cache
+    save_cache:
+      key: *gems_key
       paths:
-         - vendor/bundle
-    
+        - vendor/bundle
+
+  ## Dependencies
+  ruby_dependencies2: &ruby_dependencies2
+    run:
+      name: Bundle update
+      command: bundle update --bundler
 
 
 jobs:
-  deploy_qs:
+  test:
     <<: *android_config
     steps:
       - checkout
-  merge_after_pull_request:
-    <<: *android_config
-    steps:
-      - checkout
+      - run: *restore_gems_cache
+      - *ruby_dependencies2
+      - run:
+          name: Bundler update
+          command: gem install bundler:2.1.2
+      - *save_gems_cache
 
+version: 2.1
 workflows:
-  version: 2
   workflow:
     jobs:
-      - deploy_qs:
-          # requires:
-            # - approval_for_build_after_pull_request
+      - test:
           filters:
             branches:
               only:
-                - test
-      # - approval_for_build_after_pull_request:
-      #     type: approval
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /features/*
-      # - merge_after_pull_request:
-      #     requires:
-      #         - approval_for_merge_after_pull_request
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /features/*
-      # - approval_for_merge_after_pull_request:
-      #     type: approval
-      #     requires:
-      #         - deploy_qs
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /features/*
-
-          
+                - master
