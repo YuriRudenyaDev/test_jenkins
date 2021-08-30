@@ -39,13 +39,13 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - deploy_qs
+      - deploy_qs:
           # requires:
             # - approval_for_build_after_pull_request
-          # filters:
-          #   branches:
-          #     only:
-          #       - test
+          filters:
+            branches:
+              only:
+                - test
       # - approval_for_build_after_pull_request:
       #     type: approval
       #     filters:
