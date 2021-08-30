@@ -30,7 +30,7 @@ jobs:
       - *ruby_dependencies2
       - run:
           name: Bundler update
-          command: gem install bundler:2.1.2
+          command: gem install bundler:2.1.4
       # Store bundle cache
       - save_cache:
           key: circlev2-{{ checksum "Gemfile.lock" }}
