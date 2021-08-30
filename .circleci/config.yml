@@ -25,7 +25,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-            key: circlev2-{{ checksum "Gemfile.lock" }}
+            # key: circlev2-{{ checksum "Gemfile.lock" }}
       - run: bundle config set --local path 'vendor/bundle' && bundle check || bundle install --jobs=4 --retry=3
       - *ruby_dependencies2
       - run:
@@ -33,7 +33,7 @@ jobs:
           command: gem install bundler:2.1.4
       # Store bundle cache
       - save_cache:
-          key: circlev2-{{ checksum "Gemfile.lock" }}
+          # key: circlev2-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
 
